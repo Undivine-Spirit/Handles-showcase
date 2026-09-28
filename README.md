@@ -35,3 +35,5 @@ In active development. In the original repository, every push runs static analys
 ---
 
 **Read more:** [Handles, self-hosted](docs/CASE_STUDY.md), a case study of the deployment, the CI pipeline, and the problems solved along the way.
+
+© 2026 Undivine-Spirit. All rights reserved; see [LICENSE](LICENSE).
