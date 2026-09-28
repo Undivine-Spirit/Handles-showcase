@@ -1,0 +1,108 @@
+# Local self-hosted deployment - run this on whatever always-on machine
+# you're using. See docs/DEPLOYMENT.md for what each piece here is doing
+# and why, and for the one-time setup (secrets/, a real git checkout to
+# mount) this depends on.
+services:
+  reconcile-daemon:
+    build:
+      context: ./core
+      # Explicit now that core/Dockerfile has two final stages (daemon,
+      # api) - without this, "build the last stage" would silently start
+      # building the wrong image.
+      target: daemon
+    image: handles-reconcile-daemon:local
+    restart: unless-stopped
+
+    # Config via environment, not baked into the image - .env is
+    # gitignored (see .gitignore) since RECONCILE_INTERVAL_MINUTES etc.
+    # aren't secret, but keeping all config in one file is the more
+    # important habit than which specific values happen to be sensitive.
+    env_file:
+      - .env
+
+    volumes:
+      # The actual git checkout of this repo's catalog/ directory - a
+      # real clone with push access configured, not just a copy of the
+      # files, since GitSync needs `git push` to work from inside here.
+      # catalog-api below mounts the exact same host path - one shared
+      # checkout both containers see in real time, not two independent
+      # clones that could drift (docs/PROJECT_PLAN.md section 2,
+      # 2026-09-02: "local saves and server side create conflicts").
+      - ${CATALOG_CHECKOUT_PATH:-./catalog}:/app/catalog
+
+      # Per-account secrets (OAuth tokens + eBay app config) - see
+      # core/secrets/ebay_credentials.example.json for the shape each
+      # file needs. Never build this into the image; it's mounted at
+      # runtime and lives only on the host.
+      - ${SECRETS_HOST_PATH:-./core/secrets}:/app/secrets:ro
+
+    logging:
+      # Bounded log size - an always-on container logging forever will
+      # otherwise slowly fill the host's disk. A real production concern,
+      # not a Handles-specific one.
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  # The catalog API the app talks to - docs/PROJECT_PLAN.md section 2,
+  # 2026-09-02. Not internet-facing by itself; put a reverse proxy with a
+  # real TLS cert in front of it before pointing the app at this from
+  # outside your own network. See docs/DEPLOYMENT.md.
+  catalog-api:
+    build:
+      context: ./core
+      target: api
+    image: handles-catalog-api:local
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    # Loopback-only - this API stays private to the tailnet. `tailscale
+    # serve` publishes 127.0.0.1:8080 to your devices over HTTPS; it's
+    # never bound to a public interface at all. See docs/DEPLOYMENT.md.
+    ports:
+      - '127.0.0.1:${API_PORT:-8080}:8080'
+
+    volumes:
+      # Same host path as reconcile-daemon's mount above, on purpose.
+      - ${CATALOG_CHECKOUT_PATH:-./catalog}:/app/catalog
+
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  # Receives eBay/Walmart marketplace webhooks and wakes reconcile-daemon
+  # early via a trigger file in the shared catalog checkout, instead of
+  # waiting for RECONCILE_INTERVAL_MINUTES. Unlike the two services above,
+  # this one is meant to be reachable from the public internet - eBay/
+  # Walmart's own servers call it, and they can't join your tailnet.
+  # Exposed via `tailscale funnel`, not a public compose port mapping - see
+  # docs/DEPLOYMENT.md's webhook entry for why only this one service is
+  # public while everything else stays private.
+  webhook-receiver:
+    build:
+      context: ./core
+      target: webhook
+    image: handles-webhook-receiver:local
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - '127.0.0.1:${WEBHOOK_PORT:-8081}:8081'
+
+    volumes:
+      # Same checkout as the other two services - this is how it hands off
+      # to reconcile-daemon without a new network/auth path between them.
+      - ${CATALOG_CHECKOUT_PATH:-./catalog}:/app/catalog
+
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'

@@ -1,0 +1,52 @@
+{
+  "$comment": "Registry of connected seller accounts. Keys here are the account keys used in each catalog item's `stores` map (catalog/schema.json). One platform can appear more than once - see ebay_store_a / ebay_store_b. Showcase copy: account names are placeholders and storefront URLs are removed.",
+  "ebay_store_a": {
+    "platform": "ebay",
+    "display_name": "eBay Store A",
+    "store_url": null,
+    "automation": "full",
+    "notes": "See docs/API_RESEARCH.md - eBay Sell APIs."
+  },
+  "ebay_store_b": {
+    "platform": "ebay",
+    "display_name": "eBay Store B",
+    "store_url": null,
+    "automation": "full",
+    "notes": "Separate eBay account/store from ebay_store_a, same platform adapter, needs its own OAuth token pair."
+  },
+  "poshmark": {
+    "platform": "poshmark",
+    "display_name": "Poshmark closet",
+    "store_url": null,
+    "automation": "monitor_only",
+    "notes": "No official seller API - see docs/API_RESEARCH.md. get_listing/monitoring only, no automated write."
+  },
+  "vinted": {
+    "platform": "vinted",
+    "display_name": "Vinted",
+    "store_url": null,
+    "automation": "monitor_only",
+    "notes": "No general public listing-management API - see docs/API_RESEARCH.md."
+  },
+  "mercari": {
+    "platform": "mercari",
+    "display_name": "Mercari",
+    "store_url": null,
+    "automation": "monitor_only",
+    "notes": "No official seller API - see docs/API_RESEARCH.md."
+  },
+  "walmart": {
+    "platform": "walmart",
+    "display_name": null,
+    "store_url": null,
+    "automation": "full",
+    "notes": "Requires completing Walmart's seller/API onboarding (docs/API_RESEARCH.md) before any endpoint works."
+  },
+  "amazon": {
+    "platform": "amazon",
+    "display_name": null,
+    "store_url": null,
+    "automation": "deferred",
+    "notes": "Placeholder entry so the schema/UI can represent Amazon without requiring SP-API developer registration - flip to monitor_only or full once there's a storefront to connect."
+  }
+}

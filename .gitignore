@@ -1,0 +1,24 @@
+Thumbs.db
+.DS_Store
+*.log
+
+# Secrets / credentials - never commit store API keys or tokens
+.env
+.env.*
+!.env.example
+*.pem
+secrets.json
+/**/secrets/*
+!/**/secrets/*.example.json
+!/**/secrets/.gitkeep
+
+# Dart/Flutter
+.dart_tool/
+.packages
+build/
+# pubspec.lock is deliberately NOT ignored: core/ and app/ are applications,
+# and core/Dockerfile COPYs the lockfile - ignoring it broke every clean
+# checkout build (the server clone and both CI image jobs).
+
+# Real Kubernetes secrets - k8s/secret.example.yaml is the template
+k8s/secret.yaml

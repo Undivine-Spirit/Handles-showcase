@@ -1,0 +1,62 @@
+[
+  {
+    "brand": "Nike",
+    "reason": "Frequently cited across VeRO-checker tools (PriceYak, AutoDS, SuperDS) and eBay's own VeRO Participant Profiles directory as an active, high-volume rights-owner report filer.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Disney",
+    "reason": "Repeatedly named among the most-enforced VeRO brands, and licensed-character merchandise is one of the highest-complaint categories generally.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "LEGO",
+    "reason": "Licensed toys are a structurally high-complaint category; LEGO specifically is a commonly cited VeRO enforcer.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Pokemon",
+    "reason": "Licensed toy/trading-card brand named among the highest-complaint categories for unauthorized-reseller reports.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Apple",
+    "reason": "Named among the most commonly enforced brands by third-party VeRO-checker tools (branded electronics accessories are a flagged high-complaint category more broadly).",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Louis Vuitton",
+    "reason": "Luxury/designer goods are a structurally high-complaint category; named directly among the most commonly enforced VeRO brands.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Bose",
+    "reason": "Listed on eBay's own published VeRO Participant Profiles directory.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Adobe",
+    "reason": "Listed on eBay's own published VeRO Participant Profiles directory.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Abercrombie & Fitch",
+    "reason": "Listed on eBay's own published VeRO Participant Profiles directory; branded apparel is a flagged high-complaint category more broadly.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  },
+  {
+    "brand": "Amway",
+    "reason": "Listed on eBay's own published VeRO Participant Profiles directory.",
+    "source": "curated",
+    "added_at": "2026-08-29T00:00:00.000Z"
+  }
+]

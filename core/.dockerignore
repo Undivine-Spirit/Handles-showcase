@@ -1,0 +1,11 @@
+# Never let real secrets into a build context/image layer, even
+# accidentally - this is a real Docker footgun: a COPY . . picks up
+# everything in the directory unless explicitly excluded here.
+secrets/
+!secrets/*.example.json
+
+.dart_tool/
+.git/
+build/
+test/
+*.md

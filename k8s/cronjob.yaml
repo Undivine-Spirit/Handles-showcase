@@ -1,0 +1,88 @@
+# The actual scheduled workload. Kubernetes' CronJob controller creates a
+# fresh Job (and Pod) on this schedule - there's no long-running process
+# to keep alive between runs, which is why reconcile_daemon.dart has a
+# RUN_ONCE mode: this Pod runs it once and is expected to exit.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: handles-reconcile
+  namespace: handles
+spec:
+  # Every 15 minutes - matches the docker-compose deployment's default
+  # RECONCILE_INTERVAL_MINUTES, just expressed as a cron schedule instead
+  # of an internal sleep, since Kubernetes owns the timing here.
+  schedule: '*/15 * * * *'
+
+  # Don't start a new run if the last one is still going - a slow git push
+  # or a rate-limited eBay call shouldn't stack up overlapping Pods
+  # reconciling the same catalog at once.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      # Kill a stuck run rather than let it hang until the next schedule
+      # tick piles another one up behind it.
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          restartPolicy: Never
+
+          # Each run clones the catalog repo fresh into a volume shared
+          # with the main container - stateless and disposable, matching
+          # a Job's own ephemeral nature, rather than trying to persist a
+          # clone across runs (which would need a PersistentVolumeClaim
+          # and a specific storage class - skipped for now to keep this
+          # portable across whatever storage the Pi cluster has).
+          initContainers:
+            - name: fetch-catalog
+              image: alpine/git:2.45.2
+              envFrom:
+                - secretRef:
+                    name: handles-git-credentials
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  git clone --depth 1 \
+                    "https://x-access-token:${GIT_PAT}@github.com/Undivine-Spirit/Handles-Inventory-management.git" \
+                    /workspace/repo
+                  git -C /workspace/repo config user.email "handles-daemon@localhost"
+                  git -C /workspace/repo config user.name "Handles Reconciliation Daemon"
+              volumeMounts:
+                - name: catalog-workspace
+                  mountPath: /workspace
+              resources:
+                requests: { cpu: 50m, memory: 64Mi }
+                limits: { cpu: 200m, memory: 128Mi }
+
+          containers:
+            - name: reconcile-daemon
+              image: ghcr.io/undivine-spirit/handles-reconcile-daemon:latest
+              envFrom:
+                - configMapRef:
+                    name: handles-daemon-config
+              volumeMounts:
+                - name: catalog-workspace
+                  mountPath: /workspace
+                - name: ebay-secrets
+                  mountPath: /app/secrets
+                  readOnly: true
+              # Raspberry Pi hardware is genuinely resource-constrained
+              # compared to a cloud VM - request/limit deliberately small,
+              # matching this project's own "efficient by default"
+              # principle (docs/PROJECT_PLAN.md section 7), not a
+              # copy-pasted default.
+              resources:
+                requests: { cpu: 100m, memory: 128Mi }
+                limits: { cpu: 500m, memory: 256Mi }
+
+          volumes:
+            - name: catalog-workspace
+              emptyDir: {}
+            - name: ebay-secrets
+              secret:
+                secretName: handles-ebay-secrets

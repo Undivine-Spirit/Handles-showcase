@@ -1,0 +1,21 @@
+name: handles_core
+description: >
+  Platform-agnostic business logic for Handles - catalog model, store
+  adapter interface, and per-marketplace adapter implementations. Pure
+  Dart, no Flutter dependency, so it's usable and testable without the
+  Flutter SDK or any platform toolchain.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  crypto: ^3.0.0
+  http: ^1.2.0
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^4.0.0

@@ -1,0 +1,15 @@
+# Non-secret config - the daemon's ordinary env vars. Separate resource
+# from the Secret on purpose: a ConfigMap is safe to read, log, and commit
+# in full (this file has real values, not a template, precisely because
+# none of it is sensitive); anything actually sensitive lives in
+# secret.example.yaml's shape instead, never here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: handles-daemon-config
+  namespace: handles
+data:
+  RUN_ONCE: 'true' # CronJob mode - see reconcile_daemon.dart's main() doc comment
+  GIT_SYNC_ENABLED: 'true'
+  CATALOG_DIR: /workspace/repo/catalog
+  SECRETS_DIR: /app/secrets

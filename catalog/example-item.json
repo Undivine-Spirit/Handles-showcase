@@ -1,0 +1,26 @@
+{
+  "sku": "HND-0001",
+  "title": "Example listing title",
+  "description": "Example description text.",
+  "price": 24.99,
+  "quantity": 3,
+  "images": [
+    "https://example.com/images/hnd-0001-1.jpg"
+  ],
+  "category": "Example category",
+  "condition": "New",
+  "stores": {
+    "ebay_store_b": {
+      "platform": "ebay",
+      "external_listing_id": "",
+      "external_offer_id": "",
+      "last_synced_at": null,
+      "sync_status": "pending"
+    },
+    "poshmark": {
+      "platform": "poshmark",
+      "last_synced_at": null,
+      "sync_status": "manual_only"
+    }
+  }
+}

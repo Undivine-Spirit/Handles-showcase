@@ -1,0 +1,8 @@
+# A dedicated namespace, not the cluster's `default` - on a cluster you're
+# sharing with someone else's other workloads (your friend's Pi cluster),
+# namespacing is what keeps "handles" resources easy to find, secure, and
+# delete as a unit, and keeps its RBAC/quota scoped to just this app.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: handles

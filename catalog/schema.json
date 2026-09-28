@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Undivine-Spirit/Handles/catalog/schema.json",
+  "title": "Handles catalog item",
+  "description": "Canonical source-of-truth record for one SKU. See docs/PROJECT_PLAN.md section 4-5.",
+  "type": "object",
+  "required": ["sku", "title", "price", "quantity", "stores"],
+  "properties": {
+    "sku": {
+      "type": "string",
+      "description": "Canonical internal ID, stable across all stores."
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Source-of-truth price in the account's base currency."
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Source-of-truth quantity. 0 triggers auto-unlist across all connected stores."
+    },
+    "images": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "category": { "type": "string" },
+    "condition": { "type": "string" },
+    "stores": {
+      "type": "object",
+      "description": "One entry per connected *account* this SKU is (or should be) listed on - keyed by account key, not platform, since one platform can have multiple seller accounts (e.g. two eBay stores). See catalog/stores.json for the registered account keys and which platform/adapter each one maps to.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["platform", "sync_status"],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "description": "Which store adapter handles this account - e.g. 'ebay', 'walmart', 'poshmark'. Multiple accounts can share a platform."
+          },
+          "external_listing_id": { "type": "string" },
+          "external_offer_id": {
+            "type": "string",
+            "description": "eBay-specific: the published offer tied to the inventory item."
+          },
+          "listing_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Direct link to this item's live listing on this account - for a human to open and check/manage themselves. Not used for any automated fetching; Poshmark/Vinted/Mercari have no official API (see docs/API_RESEARCH.md), so this is the deliberately manual alternative to scraping."
+          },
+          "last_synced_at": { "type": "string", "format": "date-time" },
+          "sync_status": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "conflict", "manual_only", "error"]
+          },
+          "last_confirmed_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "What this store's own listed quantity was the last time reconciliation engine v2 verified a write - the baseline it compares a fresh read against to tell a real sale on this store apart from the source-of-truth quantity simply not having been pushed yet. Absent for a listing that's never been through a v2 write-then-verify."
+          }
+        }
+      }
+    }
+  }
+}
